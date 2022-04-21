@@ -40,24 +40,70 @@ public class ProductRestController {
 		System.out.println(this.getClass());
 	}
 	
+	@Value("#{commonProperties['pageUnit']}")
+	//@Value("#{commonProperties['pageUnit'] ?: 3}")
+	int pageUnit;
+	
+	@Value("#{commonProperties['pageSize']}")
+	//@Value("#{commonProperties['pageSize'] ?: 2}")
+	int pageSize;
+	
 	@RequestMapping( value="json/getProduct/{prodNo}", method=RequestMethod.GET )
 	public Product getProduct( @PathVariable int prodNo ) throws Exception{
 		
 		System.out.println("/product/json/getProduct : GET");
 		
-		Product product = new Product();
+		//Business Logic
+		return productService.getProduct(prodNo);
+	}
+	
+	@RequestMapping( value="json/readProduct/{prodNo}", method=RequestMethod.GET )
+	public Product readProduct( @PathVariable int prodNo ) throws Exception{
+		
+		System.out.println("/product/json/readProduct : GET");
 		
 		//Business Logic
 		return productService.getProduct(prodNo);
 	}
 
-//	@RequestMapping( value="json/addProduct", method=RequestMethod.POST )
-//	public void addProduct(	@RequestBody Product product, @RequestParam("manuDate") String manuDate ) throws Exception{
-//		product.setManuDate(manuDate.replace("-", ""));
-//		System.out.println("/product/json/addProduct : POST");
-//		//Business Logic
-//		System.out.println("::"+product);
-//		
-//		return productService.addProduct(product);
-//	}
+	@RequestMapping( value="json/addProduct", method=RequestMethod.POST )
+	public Product addProduct(@RequestBody Product product) throws Exception{
+		System.out.println("/product/json/addProduct : POST");
+		
+		//Business Logic
+		System.out.println("::"+product);
+		productService.addProduct(product);
+		return product;
+	}
+	
+	@RequestMapping( value="json/updateProduct", method=RequestMethod.POST )
+	public Product updateProduct(@RequestBody Product product) throws Exception{
+		System.out.println("/product/json/updateProduct : POST");
+		
+		//Business Logic
+		System.out.println("::"+product);
+		productService.updateProduct(product);
+		return product;
+	}
+	
+	@RequestMapping( value="json/listProduct" )
+	public Map listProduct( @ModelAttribute("search") Search search , Model model , HttpServletRequest request) throws Exception{
+		
+		System.out.println("/product/listProduct : GET / POST");
+		
+		if(search.getCurrentPage() ==0 ){
+			search.setCurrentPage(1);
+		}
+		search.setPageSize(pageSize);
+		
+		// Business logic ผ๖วเ
+		Map<String , Object> map=productService.getProductList(search);
+		
+		Page resultPage = new Page( search.getCurrentPage(), ((Integer)map.get("totalCount")).intValue(), pageUnit, pageSize);
+		System.out.println(resultPage);
+		
+		return map;
+	}
+	
+	
 }
