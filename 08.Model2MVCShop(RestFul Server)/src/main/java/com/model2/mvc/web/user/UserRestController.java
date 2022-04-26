@@ -1,5 +1,6 @@
 package com.model2.mvc.web.user;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +80,7 @@ public class UserRestController {
 	}
 	
 	@RequestMapping( value="json/updateUser", method=RequestMethod.POST )
-	public User updateUser(@RequestBody User user, HttpSession session) throws Exception{
+	public User updateUser(@RequestBody User user) throws Exception{
 		
 		System.out.println("/user/json/updateUser : POST");
 		//Business Logic
@@ -93,21 +94,23 @@ public class UserRestController {
 		return user;
 	}
 	
-	@RequestMapping( value="json/checkDuplication/{userId}", method=RequestMethod.POST )
-	public String checkDuplication( @RequestParam("userId") String userId , Model model ) throws Exception{
+	@RequestMapping( value="json/checkDuplication", method=RequestMethod.POST )
+	public Map checkDuplication( @RequestBody User user ) throws Exception{
 		
 		System.out.println("/user/checkDuplication : POST");
+		
 		//Business Logic
-		boolean result=userService.checkDuplication(userId);
-		// Model 과 View 연결
-		model.addAttribute("result", new Boolean(result));
-		model.addAttribute("userId", userId);
+		boolean result=userService.checkDuplication(user.getUserId());
 
-		return "forward:/user/checkDuplication.jsp";
+		Map<Object, String> map = new HashMap<>();
+		map.put(result, "result");
+		map.put("userId", user.getUserId());
+		
+		return map;
 	}
 	
-	@RequestMapping( value="json/listUser" )
-	public Map listUser( @ModelAttribute("search") Search search , Model model , HttpServletRequest request) throws Exception{
+	@RequestMapping( value="json/listUser", method=RequestMethod.POST )
+	public Map listUser( @RequestBody Search search) throws Exception{
 		
 		System.out.println("/user/listUser : GET / POST");
 		
@@ -122,11 +125,8 @@ public class UserRestController {
 		Page resultPage = new Page( search.getCurrentPage(), ((Integer)map.get("totalCount")).intValue(), pageUnit, pageSize);
 		System.out.println(resultPage);
 		
-		// Model 과 View 연결
-		model.addAttribute("list", map.get("list"));
-		model.addAttribute("resultPage", resultPage);
-		model.addAttribute("search", search);
-		
 		return map;
 	}
+	
+	
 }

@@ -53,7 +53,7 @@
 	<select  id="getProductList"  parameterType="search" resultMap="productSelectMap">
 	  	SELECT *
 	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
-	  					FROM		(	SELECT prod_no, prod_name, price, manufacture_day
+	  					FROM		(	SELECT *
 											FROM product
 											<if test="searchCondition != null">
 												<where>

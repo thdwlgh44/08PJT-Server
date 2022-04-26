@@ -86,10 +86,10 @@ public class ProductRestController {
 		return product;
 	}
 	
-	@RequestMapping( value="json/listProduct" )
-	public Map listProduct( @ModelAttribute("search") Search search , Model model , HttpServletRequest request) throws Exception{
+	@RequestMapping( value="json/getProductList")
+	public Map getProductList(@RequestBody Search search) throws Exception {
 		
-		System.out.println("/product/listProduct : GET / POST");
+		System.out.println("/product/getProductList : GET / POST");
 		
 		if(search.getCurrentPage() ==0 ){
 			search.setCurrentPage(1);
@@ -100,6 +100,7 @@ public class ProductRestController {
 		Map<String , Object> map=productService.getProductList(search);
 		
 		Page resultPage = new Page( search.getCurrentPage(), ((Integer)map.get("totalCount")).intValue(), pageUnit, pageSize);
+		
 		System.out.println(resultPage);
 		
 		return map;
